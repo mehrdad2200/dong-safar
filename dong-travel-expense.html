@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سامانه پیشرفته مدیریت دُنگ و مخارج سفر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #091615;
+    --bg-soft: #0d201e;
+    --panel: #112926;
+    --panel-2: #163531;
+    --paper: #fcfaf2;
+    --paper-line: #e6dfcc;
+    --paper-line-2: #dbd2b9;
+    --ink: #1e241c;
+    --ink-soft: #556354;
+    --gold: #d4a34b;
+    --gold-bright: #f0cb7b;
+    --green: #2ec4b6;
+    --red: #e76f51;
+    --text-light: #f4f6f0;
+    --muted: #8fa39b;
+    --radius: 24px;
+    --shadow-lg: 0 40px 80px -30px rgba(0,0,0,.7);
+    --shadow-sm: 0 12px 30px -15px rgba(0,0,0,.5);
+  }
+
+  body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text-light);
+    font-family: 'Vazirmatn', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    background: radial-gradient(1200px 700px at 85% -10%, rgba(212,163,75,.15), transparent 65%), var(--bg);
+    overflow-x: hidden;
+  }
+
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px 100px; }
+  
+  .hero { position: relative; padding: 60px 24px 40px; text-align: center; }
+  h1.title { font-size: clamp(34px, 6vw, 58px); font-weight: 900; margin: 0 0 12px; color: var(--gold-bright); text-shadow: 0 4px 20px rgba(240,203,123,0.2); }
+  .subtitle { font-size: 16px; color: var(--muted); max-width: 600px; margin: 0 auto 24px; }
+
+  .card {
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    padding: 28px;
+    position: relative;
+    margin-bottom: 24px;
+  }
+
+  .grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 24px; align-items: start; }
+  @media (max-width: 950px) { .grid { grid-template-columns: 1fr; } }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 13.5px; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
+  .field input, .field select, .field textarea {
+    width: 100%; background: rgba(0,0,0,.2); border: 1px solid rgba(255,255,255,.12);
+    color: var(--text-light); border-radius: 14px; padding: 12px 16px; font-size: 14.5px; font-family: inherit; outline: none;
+    transition: all 0.2s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); background: rgba(0,0,0,.3); box-shadow: 0 0 0 3px rgba(212,163,75,0.15); }
+
+  .btn {
+    border: none; cursor: pointer; border-radius: 999px; padding: 12px 24px; font-weight: 700; font-size: 14px;
+    display: inline-flex; align-items: center; gap: 8px; transition: all .2s; justify-content: center;
+  }
+  .btn-gold { background: linear-gradient(135deg, var(--gold-bright), var(--gold)); color: #1a1002; box-shadow: 0 4px 15px rgba(212,163,75,0.3); }
+  .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212,163,75,0.4); }
+  .btn-ghost { background: rgba(255,255,255,.05); color: var(--text-light); border: 1px solid rgba(255,255,255,.12); }
+  .btn-ghost:hover { background: rgba(255,255,255,.1); }
+  .btn-sm { padding: 8px 16px; font-size: 12.5px; }
+
+  .people-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .chip {
+    display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1); padding: 8px 16px; border-radius: 999px; font-size: 14px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .split-type-tabs { display: flex; gap: 10px; margin-bottom: 14px; }
+  .tab-btn { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); padding: 8px 16px; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 13px; flex: 1; }
+  .tab-btn.active { background: var(--gold); color: #000; font-weight: bold; border-color: var(--gold); }
+
+  .custom-split-container { display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.15); padding: 14px; border-radius: 16px; }
+  .custom-split-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+  .custom-split-row input { width: 100px; padding: 6px; text-align: center; }
+
+  .expense-list { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .expense-item {
+    background: rgba(0,0,0,.18); border: 1px solid rgba(255,255,255,.07);
+    border-radius: 16px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  }
+
+  .receipt { background: var(--paper); color: var(--ink); border-radius: 8px; padding: 40px 28px; position: relative; box-shadow: var(--shadow-lg); }
+  .receipt-head { text-align: center; }
+  .receipt-head h2 { font-size: 24px; margin: 6px 0; font-weight: 900; color: #111; }
+  .dashed { border: none; border-top: 2px dashed var(--paper-line-2); margin: 20px 0; }
+  
+  .balance-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-size: 14.5px; border-bottom: 1px dotted var(--paper-line); }
+  .amt.pos { color: #167a53; font-weight: bold; }
+  .amt.neg { color: #b23b29; font-weight: bold; }
+
+  .settle-line { display: flex; align-items: center; gap: 12px; font-size: 14px; padding: 10px 14px; background: rgba(212,163,75,.09); border: 1px solid rgba(212,163,75,.3); border-radius: 10px; margin-bottom: 8px; }
+  .barcode { margin-top: 24px; height: 35px; background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 6px); opacity: .8; }
+  
+  .category-badge { font-size: 11.5px; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.12); margin-right: 6px; font-weight: bold; }
+  .chart-container { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+  .chart-bar-row { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+  .chart-bar-track { flex-grow: 1; height: 10px; background: rgba(0,0,0,0.1); border-radius: 5px; overflow: hidden; }
+  .chart-bar-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.4s ease; }
+
+  .toolbar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; justify-content: space-between; }
+  .share-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+  @media (max-width: 500px) { .share-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .social-btn { padding: 8px; font-size: 12px; font-weight: bold; text-align: center; border-radius: 8px; border: none; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .btn-tg { background-color: #0088cc; }
+  .btn-wa { background-color: #25d366; }
+  .btn-ble { background-color: #5856d6; }
+  .btn-eta { background-color: #ff9500; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(20px) scale(.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes popIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
+
+  /* ---- Stats cards ---- */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 16px; }
+  @media (max-width: 760px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+  .stat-box { background: rgba(0,0,0,.2); border: 1px solid rgba(255,255,255,.07); border-radius: 16px; padding: 14px 16px; }
+  body.light-theme .stat-box { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.08); }
+  .stat-box .stat-label { font-size: 11.5px; color: var(--muted); margin-bottom: 6px; }
+  .stat-box .stat-value { font-size: 18px; font-weight: 800; color: var(--gold-bright); }
+
+  /* ---- Person avatars ---- */
+  .avatar { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #1a1002; flex-shrink: 0; }
+
+  /* ---- Toolbar controls: sort/filter ---- */
+  .filter-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .filter-row select { background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.12); color: var(--text-light); border-radius: 10px; padding: 8px 10px; font-family: inherit; font-size: 12.5px; }
+  body.light-theme .filter-row select { background: #fff; color: #241d10; border-color: rgba(0,0,0,.15); }
+
+  .search-wrap { position: relative; width: 100%; }
+  .search-wrap .clear-search { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--muted); cursor: pointer; font-size: 15px; display: none; }
+
+  .expense-item-actions { display: flex; align-items: center; gap: 6px; }
+  .icon-btn { background: none; border: none; cursor: pointer; font-size: 15px; padding: 4px; border-radius: 6px; opacity: .8; }
+  .icon-btn:hover { opacity: 1; background: rgba(255,255,255,.08); }
+
+  .empty-state { text-align: center; padding: 26px 10px; color: var(--muted); font-size: 13.5px; }
+  .empty-state .emoji { font-size: 32px; display: block; margin-bottom: 8px; }
+
+  /* ---- Toasts ---- */
+  #toastHost { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; align-items: center; width: 100%; padding: 0 16px; pointer-events: none; }
+  .toast { pointer-events: auto; background: #1c2a27; color: #fff; border: 1px solid rgba(255,255,255,.12); padding: 12px 18px; border-radius: 14px; font-size: 13.5px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow-lg); animation: toastIn .25s ease; max-width: 420px; }
+  .toast.success { border-color: rgba(46,196,182,.4); }
+  .toast.error { border-color: rgba(231,111,81,.5); }
+  .toast button.toast-action { background: var(--gold); color: #1a1002; border: none; border-radius: 999px; padding: 5px 12px; font-weight: 800; font-size: 12px; cursor: pointer; white-space: nowrap; }
+
+  /* ---- Modal ---- */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 9998; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: linear-gradient(180deg, var(--panel), var(--panel-2)); border: 1px solid rgba(255,255,255,.1); border-radius: 20px; padding: 24px; max-width: 420px; width: 100%; box-shadow: var(--shadow-lg); animation: popIn .2s ease; }
+  body.light-theme .modal-box { background: linear-gradient(180deg, #fffdf7, #fbf2dd); }
+  .modal-box h4 { margin: 0 0 10px; }
+  .modal-box p { font-size: 13.5px; color: var(--muted); line-height: 1.8; margin: 0 0 18px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .modal-box .field input { margin-bottom: 4px; }
+
+  /* ---- Mobile tab switcher ---- */
+  .mobile-tabbar { display: none; }
+  @media (max-width: 950px) {
+    .mobile-tabbar {
+      display: flex; position: sticky; top: 0; z-index: 50; gap: 8px; background: var(--bg-soft);
+      padding: 10px 12px; margin: 0 -24px 16px; border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .mobile-tabbar button { flex: 1; }
+    .grid.mobile-show-form .receipt-panel { display: none; }
+    .grid.mobile-show-receipt .sidebar { display: none; }
+  }
+  body.light-theme .mobile-tabbar { background: #f4ede0; border-color: rgba(0,0,0,.08); }
+
+  /* ---- Mobile fine tuning ---- */
+  @media (max-width: 600px) {
+    .wrap { padding: 0 14px 90px; }
+    .hero { padding: 20px 12px 24px; }
+    .card { padding: 18px; border-radius: 18px; }
+    .toolbar { justify-content: flex-start; }
+    .toolbar .btn { flex: 1 1 calc(50% - 6px); }
+    h1.title { font-size: 26px; }
+    .receipt { padding: 24px 16px; }
+    .share-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .mobile-tabbar { margin: 0 -14px 16px; }
+  }
+
+  /* ---- Light (day) theme ---- */
+  body.light-theme {
+    background: radial-gradient(1200px 700px at 85% -10%, rgba(212,163,75,.18), transparent 65%), #f4ede0;
+    color: #241d10;
+  }
+  body.light-theme .card { background: linear-gradient(180deg, #fffdf7, #fbf2dd); border-color: rgba(0,0,0,.08); }
+  body.light-theme .field label { color: #6b6047; }
+  body.light-theme .field input, body.light-theme .field select, body.light-theme .field textarea {
+    background: #fff; color: #241d10; border-color: rgba(0,0,0,.15);
+  }
+  body.light-theme .btn-ghost { background: rgba(0,0,0,.05); color: #241d10; border-color: rgba(0,0,0,.15); }
+  body.light-theme .btn-ghost:hover { background: rgba(0,0,0,.1); }
+  body.light-theme .chip { background: rgba(0,0,0,.05); border-color: rgba(0,0,0,.12); color: #241d10; }
+  body.light-theme .tab-btn { background: rgba(0,0,0,.05); border-color: rgba(0,0,0,.12); color: #6b6047; }
+  body.light-theme .expense-item { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); }
+  body.light-theme .custom-split-container { background: rgba(0,0,0,.04); }
+  body.light-theme .subtitle { color: #6b6047; }
+  body.light-theme h1.title { color: #a9762c; text-shadow: none; }
+
+  /* ---- Auth UI ---- */
+  .auth-bar { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 10px; flex-wrap: wrap; }
+  .gsi-btn {
+    display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #3c4043;
+    border: 1px solid #dadce0; border-radius: 999px; padding: 9px 18px 9px 14px; font-family: inherit;
+    font-size: 13.5px; font-weight: 600; cursor: pointer; transition: box-shadow .2s, background .2s;
+  }
+  .gsi-btn:hover { background: #f7f8f8; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+  .gsi-btn svg { width: 18px; height: 18px; }
+  .user-chip { display: flex; align-items: center; gap: 10px; background: var(--panel); border: 1px solid rgba(255,255,255,.1); padding: 6px 14px 6px 6px; border-radius: 999px; font-size: 13.5px; }
+  .user-chip img { width: 28px; height: 28px; border-radius: 50%; }
+  .user-chip button { background: none; border: none; color: var(--red); cursor: pointer; font-size: 12px; font-weight: bold; }
+  .sync-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--muted); padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.05); }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; }
+  .sync-pill.saving .sync-dot { background: var(--gold); border-radius: 2px; animation: spin 1s linear infinite; }
+  .auth-note { font-size: 12px; color: var(--muted); max-width: 480px; margin: 6px auto 0; text-align: center; line-height: 1.8; }
+
+  @media print {
+    body { background: white; color: black; }
+    .wrap, .hero, .toolbar, .sidebar, .btn, .mobile-tabbar { display: none !important; }
+    .grid { grid-template-columns: 1fr; }
+    .receipt { box-shadow: none; border: none; padding: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px; flex-wrap: wrap; gap: 10px;">
+      <button class="btn btn-ghost btn-sm" id="themeToggleBtn">🌓 حالت روز و شب فانتزی</button>
+      <div id="authArea"></div>
+    </div>
+    <div id="authNote" class="auth-note"></div>
+    <h1 class="title" id="tripTitleDisplay">حساب دُنگ و مخارج سفر 🏕</h1>
+    <p class="subtitle" id="shamsiDateDisplay">در حال بارگذاری تقویم و زمان هوشمند...</p>
+    <button class="btn btn-ghost btn-sm" id="editTripBtn" style="margin: 10px auto 0;">✏️ ویرایش نام سفر و بازه تاریخ</button>
+  </header>
+
+  <div class="wrap">
+    <div class="toolbar">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn btn-gold btn-sm" id="pdfBtn">🖨 دریافت نسخه خروجی PDF</button>
+        <button class="btn btn-ghost btn-sm" id="saveFileBtn">📥 دانلود فایل نسخه پشتیبان</button>
+        <button class="btn btn-ghost btn-sm" id="loadFileBtn">📤 بارگذاری بک‌آپ قبلی</button>
+        <button class="btn btn-ghost btn-sm" id="exportCsvBtn">📊 خروجی اکسل (CSV)</button>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="border-color: var(--red); color: var(--red);" id="clearAllBtn">🗑 پاکسازی کامل اطلاعات اتاق</button>
+    </div>
+
+    <section class="card">
+      <h3>👥 ۱. مدیریت همسفران و وزن دنگ</h3>
+      <div class="people-row" id="peopleRow"></div>
+      <div class="people-row" style="margin-top:16px;">
+        <div style="display: flex; gap: 10px; background: rgba(0,0,0,.2); padding: 6px; border-radius: 50px; flex-wrap: wrap;">
+          <input type="text" id="personInput" placeholder="نام همسفر..." style="background:transparent; border:none; color:#fff; padding: 8px 16px; outline:none; width:150px;" maxlength="20">
+          <input type="number" id="personWeight" placeholder="ضریب دنگ" value="1" min="1" max="10" style="width: 70px; background:rgba(0,0,0,0.25); border:none; color:#fff; text-align:center; border-radius:50px;">
+          <button class="btn btn-gold btn-sm" id="addPersonBtn">➕ افزودن به گروه</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="sampleBtn">⚡ تزریق دیتای نمونه پیش‌فرض</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>📈 آمار کلی سفر</h3>
+      <div class="stats-grid" id="statsGrid"></div>
+    </section>
+
+    <div class="mobile-tabbar">
+      <button class="btn btn-gold btn-sm" id="mtabForm">🧾 ثبت و لیست هزینه‌ها</button>
+      <button class="btn btn-ghost btn-sm" id="mtabReceipt">📄 فاکتور و تراز</button>
+    </div>
+
+    <div class="grid mobile-show-form" id="mainGrid">
+      <section class="card sidebar">
+        <h3>🧾 ۲. ثبت هزینه یا فاکتور جدید</h3>
+        
+        <div class="field">
+          <label>عنوان هزینه چیه؟ 🏷</label>
+          <input type="text" id="expTitle" placeholder="مثلاً رستوران، ورودی موزه، بنزین..." maxlength="50">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px;">
+          <div class="field">
+            <label>مبلغ (با تفکیک سه رقمی) 💰</label>
+            <input type="text" id="expAmount" placeholder="۰">
+          </div>
+          <div class="field">
+            <label>ارز فاکتور 🌍</label>
+            <select id="expCurrency">
+              <option value="TOMAN">تومان (IRR)</option>
+              <option value="USD">دلار (USD)</option>
+              <option value="EUR">یورو (EUR)</option>
+              <option value="AED">درهم (AED)</option>
+              <option value="TRY">لیر ترکیه (TRY)</option>
+              <option value="IQD">دینار عراق (IQD)</option>
+              <option value="GBP">پوند (GBP)</option>
+              <option value="RUB">روبل (RUB)</option>
+              <option value="CHF">فرانک (CHF)</option>
+              <option value="CNY">یوان چین (CNY)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field" id="customRateGroup" style="display:none;">
+          <label id="customRateLabel">نرخ تبدیل ارز به تومان را وارد کنید:</label>
+          <input type="number" id="expCustomRate" value="1">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="field">
+            <label>کی حساب کرده؟ 👑</label>
+            <select id="expPayer"></select>
+          </div>
+          <div class="field">
+            <label>تاریخ فاکتور 📅</label>
+            <input type="date" id="expDate">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>دسته‌بندی نوع خرج 📑</label>
+          <select id="expCategory">
+            <option value="غذا">🍔 غذا، رستوران و کافه</option>
+            <option value="حمل‌ونقل">🚗 سوخت و حمل و نقل</option>
+            <option value="اقامت">🏨 هتل و محل اقامت</option>
+            <option value="تفریح">🎉 تفریح, بلیط و تجهیزات</option>
+            <option value="خرید">🛍 بازار و خرید سوغاتی</option>
+            <option value="پزشکی">💊 دارو و درمان اضطراری</option>
+            <option value="متفرقه">📦 متفرقه (توضیحات اختیاری)</option>
+          </select>
+        </div>
+
+        <div class="field" id="miscNotesGroup" style="display: none;">
+          <label>بابت چی بوده این هزینه متفرقه؟ 📝</label>
+          <textarea id="expMiscNotes" rows="2" placeholder="توضیحات تکمیلی یا یادداشت جداگانه این فاکتور..."></textarea>
+        </div>
+
+        <div class="field">
+          <label>تعیین سقف بودجه کل سفر (اختیاری) 🛡</label>
+          <input type="text" id="groupBudget" placeholder="مثلا 50,000,000">
+        </div>
+
+        <div class="field">
+          <label>روش محاسبه تقسیم سهم ⚖️</label>
+          <div class="split-type-tabs">
+            <button class="tab-btn active" id="tabEqual">مساوی (هوشمند با وزن)</button>
+            <button class="tab-btn" id="tabCustom">نامساوی (مبلغ مستقیم)</button>
+          </div>
+          <div id="splitAllocationArea"></div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-gold" id="addExpenseBtn" style="width: 100%;">ثبت و محاسبه فاکتور در تراز مالی</button>
+          <button class="btn btn-ghost" id="cancelEditBtn" style="display:none; white-space:nowrap;">✕ انصراف</button>
+        </div>
+
+        <div class="dashed"></div>
+        <div class="search-wrap" style="margin-bottom: 12px;">
+          <input type="text" id="searchExpense" placeholder="🔍 فیلتر و جستجوی آنی در مخارج ثبت شده..." style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); padding: 10px 34px 10px 10px; border-radius: 10px; color: #fff; width: 100%; box-sizing: border-box;">
+          <button class="clear-search" id="clearSearchBtn" title="پاک کردن جستجو">✕</button>
+        </div>
+        <div class="filter-row">
+          <select id="filterPayer"><option value="">👤 همه پرداخت‌کنندگان</option></select>
+          <select id="filterCategory">
+            <option value="">📑 همه دسته‌بندی‌ها</option>
+            <option value="غذا">🍔 غذا</option>
+            <option value="حمل‌ونقل">🚗 حمل‌ونقل</option>
+            <option value="اقامت">🏨 اقامت</option>
+            <option value="تفریح">🎉 تفریح</option>
+            <option value="خرید">🛍 خرید</option>
+            <option value="پزشکی">💊 پزشکی</option>
+            <option value="متفرقه">📦 متفرقه</option>
+          </select>
+          <select id="sortExpenses">
+            <option value="newest">🕓 جدیدترین</option>
+            <option value="oldest">⏳ قدیمی‌ترین</option>
+            <option value="highest">⬆️ بیشترین مبلغ</option>
+            <option value="lowest">⬇️ کمترین مبلغ</option>
+          </select>
+        </div>
+        <div style="font-size:12px; color:var(--muted); margin-bottom: 8px;" id="expenseCountLabel"></div>
+        <div class="expense-list" id="expenseList"></div>
+      </section>
+
+      <section class="card receipt receipt-panel" id="receiptZone">
+        <div class="receipt-head">
+          <div style="font-size:12px; font-weight:800; letter-spacing:2px; color: var(--ink-soft);">TRAVEL EXPENSE STATEMENT</div>
+          <h2 id="receiptTripName">فاکتور و صورت‌حساب نهایی 🧾</h2>
+          <div id="tripDatesLabel" style="font-size:11.5px; color:var(--ink-soft); font-weight:600;"></div>
+          <div id="liveClock" style="font-size: 12px; color: var(--ink-soft); font-weight: bold;"></div>
+        </div>
+        <div class="dashed"></div>
+        <div style="display:flex; justify-content:space-between; font-weight:900; font-size:16.5px;">
+          <span>مجموع مخارج انجام شده گروه:</span>
+          <span id="totalAmount">۰ تومان</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:12.5px; color:var(--ink-soft); margin-top:6px;">
+          <span>میانگین هزینه روزانه سفر:</span>
+          <span id="perDayAmount">—</span>
+        </div>
+        <div id="budgetWarning" style="color: var(--red); font-size: 13px; margin-top: 8px; font-weight: bold; display: none; background: rgba(231,111,81,0.1); padding: 8px; border-radius: 6px; text-align: center;">⚠️ هشدار: از سقف بودجه تعیین شده عبور کردید!</div>
+        
+        <div class="dashed"></div>
+        <div id="balanceList"></div>
+        <div class="dashed"></div>
+        <div id="settleBlock"></div>
+        
+        <div class="dashed"></div>
+        <h4>📊 سهم هر دسته‌بندی از کل مخارج سفر</h4>
+        <div style="display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
+          <svg id="donutChart" viewBox="0 0 120 120" style="width:110px; height:110px; flex-shrink:0;"></svg>
+          <div class="chart-container" id="categoryChart" style="flex:1; min-width:160px;"></div>
+        </div>
+
+        <div class="dashed"></div>
+        <div style="text-align: center; font-size: 13px; font-weight: bold; color: var(--ink-soft);">📲 ارسال سریع گزارش به پیام‌رسان‌ها:</div>
+        <div class="share-grid">
+          <button class="social-btn btn-tg" id="shareTg">تلگرام</button>
+          <button class="social-btn btn-wa" id="shareWa">واتس‌اپ</button>
+          <button class="social-btn btn-ble" id="shareBle">بله</button>
+          <button class="social-btn btn-eta" id="shareEta">ایتا</button>
+        </div>
+        <div class="barcode"></div>
+      </section>
+    </div>
+  </div>
+
+  <div id="toastHost"></div>
+
+  <div class="modal-overlay" id="confirmOverlay">
+    <div class="modal-box">
+      <h4 id="confirmTitle">آیا مطمئن هستید؟</h4>
+      <p id="confirmMsg"></p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost btn-sm" id="confirmCancelBtn">انصراف</button>
+        <button class="btn btn-gold btn-sm" style="background: linear-gradient(135deg, var(--red), #c65a3f); color: #fff;" id="confirmOkBtn">تایید و حذف</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="tripModalOverlay">
+    <div class="modal-box">
+      <h4>✏️ اطلاعات سفر</h4>
+      <div class="field">
+        <label>نام سفر</label>
+        <input type="text" id="tripNameInput" maxlength="40" placeholder="مثلا سفر تابستانی شمال">
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="field">
+          <label>تاریخ شروع</label>
+          <input type="date" id="tripStartInput">
+        </div>
+        <div class="field">
+          <label>تاریخ پایان</label>
+          <input type="date" id="tripEndInput">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost btn-sm" id="tripCancelBtn">انصراف</button>
+        <button class="btn btn-gold btn-sm" id="tripSaveBtn">ذخیره</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Firebase (used only for Google Sign-In + cross-device cloud sync). See CONFIG note in the script below. -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+
+<script>
+(function(){
+  "use strict";
+
+  /* =========================================================================================
+     تنظیمات ورود با گوگل و ذخیره‌سازی ابری (اختیاری)
+     ---------------------------------------------------------------------------------------
+     این برنامه به‌صورت پیش‌فرض بدون نیاز به هیچ تنظیماتی کار می‌کند و اطلاعات را در همان
+     مرورگر (localStorage) ذخیره می‌کند؛ یعنی هر بار که صفحه را باز کنید داده‌های قبلی هست.
+
+     اگر می‌خواهید قابلیت «ورود با گوگل» فعال شود و داده‌ها بین چند دستگاه/مرورگر همگام
+     شوند (روی حساب گوگل کاربر ذخیره شود)، باید یک پروژه‌ی رایگان در Firebase بسازید:
+       ۱. به https://console.firebase.google.com بروید و یک پروژه جدید بسازید.
+       ۲. از منوی Build > Authentication > Sign-in method، روش Google را فعال کنید.
+       ۳. از منوی Build > Firestore Database یک دیتابیس بسازید (حالت Production یا Test).
+       ۴. از Project settings > General، یک Web App اضافه کنید و مقادیر firebaseConfig را
+          کپی کرده و در آبجکت زیر جایگزین کنید.
+       ۵. در تب Authentication > Settings > Authorized domains، دامنه‌ای که این فایل روی آن
+          میزبانی می‌شود را اضافه کنید (برای تست لوکال معمولاً localhost از قبل هست).
+     تا وقتی این مقادیر را جایگزین نکرده‌اید، دکمه‌ی ورود با گوگل مخفی می‌ماند و برنامه فقط
+     با ذخیره‌سازی محلی (همان روال قبلی) کار می‌کند؛ هیچ خطایی هم نمی‌دهد.
+  ========================================================================================= */
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBMAKTK4vKGgeK8czU_M-oWMlwUd7xvOo",
+    authDomain: "dong-safar-401c9.firebaseapp.com",
+    projectId: "dong-safar-401c9",
+    storageBucket: "dong-safar-401c9.firebasestorage.app",
+    messagingSenderId: "550689447050",
+    appId: "1:550689447050:web:9e0a21c808ce756dde6173"
+  };
+
+  const firebaseIsConfigured = Object.values(firebaseConfig).every(v => v && !String(v).startsWith('YOUR_'));
+
+  let fbAuth = null, fbDb = null, currentUser = null, cloudSyncTimer = null;
+
+  // State
+  let people = []; 
+  let expenses = []; 
+  let nextId = 1;
+  let splitMode = "EQUAL"; 
+  let currencyRates = { TOMAN: 1, USD: 60500, EUR: 65200, AED: 16500, TRY: 1850, IQD: 46, GBP: 76000, RUB: 680, CHF: 67000, CNY: 8400 };
+  let tripName = 'حساب دُنگ و مخارج سفر 🏕';
+  let tripStart = '';
+  let tripEnd = '';
+  let editingExpenseId = null;
+  let lastDeletedExpense = null;
+  let lastDeletedExpenseIndex = null;
+  const CATEGORY_COLORS = { 'غذا': '#e76f51', 'حمل‌ونقل': '#2ec4b6', 'اقامت': '#d4a34b', 'تفریح': '#8e7cc3', 'خرید': '#4ea8de', 'پزشکی': '#ef476f', 'متفرقه': '#8fa39b' };
+
+  // DOM Elements
+  const peopleRow = document.getElementById('peopleRow');
+  const personInput = document.getElementById('personInput');
+  const personWeight = document.getElementById('personWeight');
+  const addPersonBtn = document.getElementById('addPersonBtn');
+  const sampleBtn = document.getElementById('sampleBtn');
+  const expTitle = document.getElementById('expTitle');
+  const expAmount = document.getElementById('expAmount');
+  const expCurrency = document.getElementById('expCurrency');
+  const expCustomRate = document.getElementById('expCustomRate');
+  const customRateGroup = document.getElementById('customRateGroup');
+  const customRateLabel = document.getElementById('customRateLabel');
+  const expPayer = document.getElementById('expPayer');
+  const expDate = document.getElementById('expDate');
+  const expCategory = document.getElementById('expCategory');
+  const miscNotesGroup = document.getElementById('miscNotesGroup');
+  const expMiscNotes = document.getElementById('expMiscNotes');
+  const groupBudget = document.getElementById('groupBudget');
+  const splitAllocationArea = document.getElementById('splitAllocationArea');
+  const addExpenseBtn = document.getElementById('addExpenseBtn');
+  const expenseList = document.getElementById('expenseList');
+  const totalAmount = document.getElementById('totalAmount');
+  const balanceList = document.getElementById('balanceList');
+  const settleBlock = document.getElementById('settleBlock');
+  const categoryChart = document.getElementById('categoryChart');
+  const shamsiDateDisplay = document.getElementById('shamsiDateDisplay');
+  const liveClock = document.getElementById('liveClock');
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const searchExpense = document.getElementById('searchExpense');
+  const clearSearchBtn = document.getElementById('clearSearchBtn');
+  const filterPayer = document.getElementById('filterPayer');
+  const filterCategory = document.getElementById('filterCategory');
+  const sortExpenses = document.getElementById('sortExpenses');
+  const expenseCountLabel = document.getElementById('expenseCountLabel');
+  const cancelEditBtn = document.getElementById('cancelEditBtn');
+  const statsGrid = document.getElementById('statsGrid');
+  const donutChart = document.getElementById('donutChart');
+  const perDayAmount = document.getElementById('perDayAmount');
+  const receiptTripName = document.getElementById('receiptTripName');
+  const tripDatesLabel = document.getElementById('tripDatesLabel');
+  const tripTitleDisplay = document.getElementById('tripTitleDisplay');
+  const editTripBtn = document.getElementById('editTripBtn');
+  const tripModalOverlay = document.getElementById('tripModalOverlay');
+  const tripNameInput = document.getElementById('tripNameInput');
+  const tripStartInput = document.getElementById('tripStartInput');
+  const tripEndInput = document.getElementById('tripEndInput');
+  const tripSaveBtn = document.getElementById('tripSaveBtn');
+  const tripCancelBtn = document.getElementById('tripCancelBtn');
+  const confirmOverlay = document.getElementById('confirmOverlay');
+  const confirmTitle = document.getElementById('confirmTitle');
+  const confirmMsg = document.getElementById('confirmMsg');
+  const confirmOkBtn = document.getElementById('confirmOkBtn');
+  const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+  const toastHost = document.getElementById('toastHost');
+  const mtabForm = document.getElementById('mtabForm');
+  const mtabReceipt = document.getElementById('mtabReceipt');
+  const mainGrid = document.getElementById('mainGrid');
+
+  // ---------------------------- Toast notifications ----------------------------
+  function showToast(msg, type = 'success', actionLabel = null, actionFn = null) {
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.innerHTML = `<span>${msg}</span>`;
+    if (actionLabel && actionFn) {
+      const btn = document.createElement('button');
+      btn.className = 'toast-action';
+      btn.textContent = actionLabel;
+      btn.addEventListener('click', () => { actionFn(); el.remove(); });
+      el.appendChild(btn);
+    }
+    toastHost.appendChild(el);
+    setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 300); }, actionLabel ? 5000 : 2600);
+  }
+
+  // ---------------------------- Custom confirm modal ----------------------------
+  function askConfirm(message, title = 'آیا مطمئن هستید؟') {
+    confirmTitle.textContent = title;
+    confirmMsg.textContent = message;
+    confirmOverlay.classList.add('open');
+    return new Promise((resolve) => {
+      const cleanup = () => { confirmOverlay.classList.remove('open'); confirmOkBtn.removeEventListener('click', onOk); confirmCancelBtn.removeEventListener('click', onCancel); };
+      const onOk = () => { cleanup(); resolve(true); };
+      const onCancel = () => { cleanup(); resolve(false); };
+      confirmOkBtn.addEventListener('click', onOk);
+      confirmCancelBtn.addEventListener('click', onCancel);
+    });
+  }
+
+  // ---------------------------- Avatar helper ----------------------------
+  function avatarColor(name) {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    const hue = Math.abs(hash) % 360;
+    return `hsl(${hue}, 65%, 62%)`;
+  }
+
+  // Initialization
+  function init() {
+    expDate.valueAsDate = new Date();
+    loadFromLocalStorage();
+    applyTripInfoToUI();
+    applySavedTheme();
+    setupClockAndCalendar();
+    renderAll();
+    setupAuth();
+    setupMobileTabs();
+  }
+
+  function applyTripInfoToUI() {
+    tripTitleDisplay.textContent = tripName;
+    receiptTripName.textContent = tripName;
+    if (tripStart || tripEnd) {
+      tripDatesLabel.textContent = `📅 ${tripStart || '؟'} تا ${tripEnd || '؟'}`;
+    } else {
+      tripDatesLabel.textContent = '';
+    }
+  }
+
+  function tripDurationDays() {
+    if (!tripStart || !tripEnd) return null;
+    const d1 = new Date(tripStart), d2 = new Date(tripEnd);
+    const diff = Math.round((d2 - d1) / (1000 * 60 * 60 * 24)) + 1;
+    return diff > 0 ? diff : null;
+  }
+
+  function applySavedTheme() {
+    const saved = localStorage.getItem('dong_theme_v1');
+    if (saved === 'light') document.body.classList.add('light-theme');
+  }
+
+  editTripBtn.addEventListener('click', () => {
+    tripNameInput.value = tripName;
+    tripStartInput.value = tripStart;
+    tripEndInput.value = tripEnd;
+    tripModalOverlay.classList.add('open');
+  });
+  tripCancelBtn.addEventListener('click', () => tripModalOverlay.classList.remove('open'));
+  tripSaveBtn.addEventListener('click', () => {
+    tripName = tripNameInput.value.trim() || 'حساب دُنگ و مخارج سفر 🏕';
+    tripStart = tripStartInput.value || '';
+    tripEnd = tripEndInput.value || '';
+    applyTripInfoToUI();
+    tripModalOverlay.classList.remove('open');
+    saveToLocalStorage();
+    renderAll();
+    showToast('✅ اطلاعات سفر ذخیره شد.');
+  });
+
+  function setupMobileTabs() {
+    mtabForm.addEventListener('click', () => {
+      mainGrid.classList.add('mobile-show-form');
+      mainGrid.classList.remove('mobile-show-receipt');
+      mtabForm.classList.replace('btn-ghost', 'btn-gold');
+      mtabReceipt.classList.replace('btn-gold', 'btn-ghost');
+    });
+    mtabReceipt.addEventListener('click', () => {
+      mainGrid.classList.add('mobile-show-receipt');
+      mainGrid.classList.remove('mobile-show-form');
+      mtabReceipt.classList.replace('btn-ghost', 'btn-gold');
+      mtabForm.classList.replace('btn-gold', 'btn-ghost');
+    });
+  }
+
+  // ------------------------------- Google Sign-In / Cloud Sync -------------------------------
+  const authArea = document.getElementById('authArea');
+  const authNote = document.getElementById('authNote');
+
+  function setupAuth() {
+    if (!firebaseIsConfigured) {
+      authArea.innerHTML = '';
+      authNote.textContent = 'ℹ️ اطلاعات شما به‌صورت خودکار در همین مرورگر ذخیره می‌شود. برای فعال‌سازی «ورود با گوگل» و همگام‌سازی ابری بین چند دستگاه، تنظیمات Firebase را در ابتدای اسکریپت کامل کنید.';
+      renderAuthUI();
+      return;
+    }
+    try {
+      const app = firebase.initializeApp(firebaseConfig);
+      fbAuth = firebase.auth();
+      fbDb = firebase.firestore();
+
+      fbAuth.onAuthStateChanged(async (user) => {
+        currentUser = user;
+        renderAuthUI();
+        if (user) {
+          await loadFromCloud(user);
+          renderAll();
+        }
+      });
+    } catch (err) {
+      console.error('Firebase init failed:', err);
+      authNote.textContent = '⚠️ اتصال به سرویس ورود با گوگل برقرار نشد. برنامه در حالت ذخیره‌سازی محلی ادامه می‌دهد.';
+      renderAuthUI();
+    }
+  }
+
+  function renderAuthUI() {
+    authArea.innerHTML = '';
+    if (!firebaseIsConfigured) return;
+
+    if (currentUser) {
+      const chip = document.createElement('div');
+      chip.className = 'user-chip';
+      const photo = currentUser.photoURL || '';
+      chip.innerHTML = `
+        ${photo ? `<img src="${photo}" alt="">` : '👤'}
+        <span>${currentUser.displayName || currentUser.email}</span>
+        <span class="sync-pill" id="syncPill"><span class="sync-dot"></span>همگام</span>
+        <button id="signOutBtn">خروج</button>
+      `;
+      chip.querySelector('#signOutBtn').addEventListener('click', () => fbAuth.signOut());
+      authArea.appendChild(chip);
+    } else {
+      const btn = document.createElement('button');
+      btn.className = 'gsi-btn';
+      btn.innerHTML = `
+        <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.5 6 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34.5 6 29.5 4 24 4c-7.6 0-14.2 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.4 0 10.3-1.9 14-5.5l-6.5-5.5C29.4 34.6 26.8 35.5 24 35.5c-5.2 0-9.6-3.3-11.3-8l-6.6 5.1C9.8 39.6 16.4 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-0.8 2.3-2.2 4.2-4.1 5.5l6.5 5.5C41.4 35.6 44 30.2 44 24c0-1.3-.1-2.3-.4-3.5z"/></svg>
+        ورود با حساب گوگل
+      `;
+      btn.addEventListener('click', () => {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        fbAuth.signInWithPopup(provider).catch(err => {
+          console.error(err);
+          showToast('⚠️ ورود با گوگل انجام نشد. لطفاً دوباره تلاش کنید.', 'error');
+        });
+      });
+      authArea.appendChild(btn);
+    }
+  }
+
+  function cloudDocRef(user) {
+    return fbDb.collection('dong_users').doc(user.uid);
+  }
+
+  async function loadFromCloud(user) {
+    try {
+      const snap = await cloudDocRef(user).get();
+      if (snap.exists) {
+        const data = snap.data();
+        people = data.people || [];
+        expenses = data.expenses || [];
+        nextId = data.nextId || 1;
+        tripName = data.tripName || tripName;
+        tripStart = data.tripStart || '';
+        tripEnd = data.tripEnd || '';
+        applyTripInfoToUI();
+      } else {
+        // اولین ورود: داده‌های محلی موجود (اگر باشد) به حساب کاربر منتقل می‌شود.
+        await cloudDocRef(user).set({ people, expenses, nextId, tripName, tripStart, tripEnd });
+      }
+    } catch (err) {
+      console.error('Cloud load failed:', err);
+    }
+  }
+
+  function syncToCloud() {
+    if (!currentUser || !fbDb) return;
+    const pill = document.getElementById('syncPill');
+    if (pill) pill.classList.add('saving');
+    clearTimeout(cloudSyncTimer);
+    cloudSyncTimer = setTimeout(async () => {
+      try {
+        await cloudDocRef(currentUser).set({ people, expenses, nextId, tripName, tripStart, tripEnd });
+      } catch (err) {
+        console.error('Cloud sync failed:', err);
+      } finally {
+        if (pill) pill.classList.remove('saving');
+      }
+    }, 600);
+  }
+
+  function setupClockAndCalendar() {
+    try {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      shamsiDateDisplay.textContent = new Intl.DateTimeFormat('fa-IR', options).format(new Date());
+    } catch(e) {
+      shamsiDateDisplay.textContent = "سامانه مالی سفر فعال است";
+    }
+    setInterval(() => {
+      const now = new Date();
+      liveClock.textContent = now.toLocaleTimeString('fa-IR');
+    }, 1000);
+  }
+
+  // Live currency dynamic UI toggle
+  expCurrency.addEventListener('change', () => {
+    const curr = expCurrency.value;
+    if (curr === 'TOMAN') {
+      customRateGroup.style.display = 'none';
+      expCustomRate.value = '1';
+    } else {
+      customRateGroup.style.display = 'block';
+      customRateLabel.textContent = `نرخ تبدیل پیش‌فرض ${curr} به تومان (${currencyRates[curr]}):`;
+      expCustomRate.value = currencyRates[curr];
+    }
+  });
+
+  // Dynamic Toggle for Miscellaneous item field
+  expCategory.addEventListener('change', () => {
+    if (expCategory.value === 'متفرقه') {
+      miscNotesGroup.style.display = 'block';
+    } else {
+      miscNotesGroup.style.display = 'none';
+    }
+  });
+
+  // Thousand Separator Formatter
+  function commaSeparate(numStr) {
+    let clean = numStr.replace(/,/g, '');
+    let parts = clean.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join('.');
+  }
+
+  function getCleanNum(str) {
+    return parseFloat(str.replace(/,/g, '')) || 0;
+  }
+
+  expAmount.addEventListener('input', (e) => {
+    let cursor = e.target.selectionStart;
+    let oldLen = e.target.value.length;
+    e.target.value = commaSeparate(e.target.value);
+    let newLen = e.target.value.length;
+    cursor = cursor + (newLen - oldLen);
+    e.target.setSelectionRange(cursor, cursor);
+  });
+
+  groupBudget.addEventListener('input', (e) => {
+    e.target.value = commaSeparate(e.target.value);
+  });
+
+  function formatMoney(num) {
+    return Math.round(num).toLocaleString('fa-IR') + ' تومان';
+  }
+
+  // Safe formula math evaluator
+  function mathEval(str) {
+    try {
+      let clean = str.replace(/,/g, '').replace(/[^0-9+\-*/().]/g, '');
+      return Function(`"use strict"; return (${clean})`)() || 0;
+    } catch(e) {
+      return 0;
+    }
+  }
+
+  // Actions
+  addPersonBtn.addEventListener('click', () => {
+    const name = personInput.value.trim();
+    const weight = parseFloat(personWeight.value) || 1;
+    if(!name || people.some(p => p.name === name)) return;
+
+    people.push({ id: nextId++, name, weight });
+    personInput.value = '';
+    personWeight.value = '1';
+    saveToLocalStorage();
+    renderAll();
+  });
+
+  document.getElementById('tabEqual').addEventListener('click', () => {
+    splitMode = "EQUAL";
+    document.getElementById('tabEqual').classList.add('active');
+    document.getElementById('tabCustom').classList.remove('active');
+    renderSplitArea();
+  });
+
+  document.getElementById('tabCustom').addEventListener('click', () => {
+    splitMode = "CUSTOM";
+    document.getElementById('tabCustom').classList.add('active');
+    document.getElementById('tabEqual').classList.remove('active');
+    renderSplitArea();
+  });
+
+  function renderSplitArea() {
+    splitAllocationArea.innerHTML = '';
+    if(people.length === 0) {
+      splitAllocationArea.innerHTML = '<div style="font-size:12px; color:var(--muted)">ابتدا همسفران را اضافه کنید.</div>';
+      return;
+    }
+    if(splitMode === "EQUAL") {
+      splitAllocationArea.innerHTML = '<div style="font-size:12px; color:var(--muted)">تقسیم تسهیلات مالی بر اساس ضریب سهم اعضا اعمال خواهد شد.</div>';
+    } else {
+      const box = document.createElement('div');
+      box.className = 'custom-split-container';
+      people.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'custom-split-row';
+        div.innerHTML = `<span>${p.name}</span><input type="text" class="custom-share-input" data-id="${p.id}" value="0">`;
+        div.querySelector('input').addEventListener('input', (ev) => {
+          ev.target.value = commaSeparate(ev.target.value);
+        });
+        box.appendChild(div);
+      });
+      splitAllocationArea.appendChild(box);
+    }
+  }
+
+  addExpenseBtn.addEventListener('click', () => {
+    const titleRaw = expTitle.value.trim();
+    const cat = expCategory.value;
+    const title = cat === 'متفرقه' && expMiscNotes.value.trim() ? `${titleRaw || 'متفرقه'} (${expMiscNotes.value.trim()})` : (titleRaw || 'هزینه بدون عنوان');
+    
+    const amountVal = mathEval(expAmount.value);
+    const currency = expCurrency.value;
+    const rate = parseFloat(expCustomRate.value) || 1;
+    const payerId = parseInt(expPayer.value);
+    const dateStr = expDate.value || new Date().toISOString().split('T')[0];
+
+    if(amountVal <= 0 || isNaN(payerId)) {
+      showToast('⚠️ لطفاً مبلغ و پرداخت‌کننده معتبری انتخاب کنید.', 'error');
+      return;
+    }
+
+    const amountInToman = amountVal * rate;
+    let shares = {};
+
+    if(splitMode === "EQUAL") {
+      const sumW = people.reduce((s, p) => s + p.weight, 0);
+      people.forEach(p => {
+        shares[p.id] = (amountInToman * p.weight) / sumW;
+      });
+    } else {
+      const inputs = document.querySelectorAll('.custom-share-input');
+      let assignedTotal = 0;
+      inputs.forEach(inp => {
+        const pId = parseInt(inp.dataset.id);
+        const val = mathEval(inp.value);
+        shares[pId] = val;
+        assignedTotal += val;
+      });
+      if(Math.abs(assignedTotal - amountVal) > 10) {
+        showToast('⚠️ مجموع سهم‌ها با مبلغ فاکتور همخوانی ندارد!', 'error');
+        return;
+      }
+      Object.keys(shares).forEach(k => {
+        shares[k] = shares[k] * rate;
+      });
+    }
+
+    if (editingExpenseId !== null) {
+      const idx = expenses.findIndex(e => e.id === editingExpenseId);
+      if (idx !== -1) {
+        expenses[idx] = { ...expenses[idx], title, amount: amountInToman, payerId, category: cat, date: dateStr, shares };
+      }
+      exitEditMode();
+      showToast('✏️ هزینه با موفقیت ویرایش شد.');
+    } else {
+      expenses.push({ id: nextId++, title, amount: amountInToman, payerId, category: cat, date: dateStr, shares });
+      showToast('✅ هزینه جدید ثبت شد.');
+    }
+
+    expTitle.value = '';
+    expAmount.value = '';
+    expMiscNotes.value = '';
+    saveToLocalStorage();
+    renderAll();
+  });
+
+  function enterEditMode(expenseObj) {
+    editingExpenseId = expenseObj.id;
+    expTitle.value = expenseObj.title;
+    expCategory.value = expenseObj.category;
+    miscNotesGroup.style.display = expenseObj.category === 'متفرقه' ? 'block' : 'none';
+    expCurrency.value = 'TOMAN';
+    customRateGroup.style.display = 'none';
+    expCustomRate.value = 1;
+    expAmount.value = commaSeparate(String(Math.round(expenseObj.amount)));
+    expPayer.value = expenseObj.payerId;
+    expDate.value = expenseObj.date;
+    addExpenseBtn.textContent = '💾 ذخیره تغییرات هزینه';
+    cancelEditBtn.style.display = 'inline-flex';
+    document.getElementById('expTitle').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function exitEditMode() {
+    editingExpenseId = null;
+    addExpenseBtn.textContent = 'ثبت و محاسبه فاکتور در تراز مالی';
+    cancelEditBtn.style.display = 'none';
+  }
+
+  cancelEditBtn.addEventListener('click', () => {
+    exitEditMode();
+    expTitle.value = '';
+    expAmount.value = '';
+    expMiscNotes.value = '';
+  });
+
+  function duplicateExpense(expenseObj) {
+    const clone = { ...expenseObj, id: nextId++, date: new Date().toISOString().split('T')[0], shares: { ...expenseObj.shares } };
+    expenses.push(clone);
+    saveToLocalStorage();
+    renderAll();
+    showToast('📋 هزینه کپی شد.');
+  }
+
+  function calcBalances() {
+    let bal = {};
+    people.forEach(p => bal[p.id] = 0);
+    expenses.forEach(e => {
+      if(bal[e.payerId] !== undefined) bal[e.payerId] += e.amount;
+      Object.keys(e.shares).forEach(pId => {
+        if(bal[pId] !== undefined) bal[pId] -= e.shares[pId];
+      });
+    });
+    return bal;
+  }
+
+  function getSettlements(bal) {
+    let list = Object.keys(bal).map(k => ({
+      id: parseInt(k),
+      name: people.find(p => p.id === parseInt(k))?.name || '؟',
+      b: bal[k]
+    }));
+    let creditors = list.filter(x => x.b > 1).sort((a,b) => b.b - a.b);
+    let debtors = list.filter(x => x.b < -1).sort((a,b) => a.b - b.b);
+    let steps = [];
+
+    let i = 0, j = 0;
+    while(i < debtors.length && j < creditors.length) {
+      let d = debtors[i];
+      let c = creditors[j];
+      let amount = Math.min(-d.b, c.b);
+
+      steps.push({ from: d.name, to: c.name, amount });
+      d.b += amount;
+      c.b -= amount;
+
+      if(Math.abs(d.b) < 1) i++;
+      if(Math.abs(c.b) < 1) j++;
+    }
+    return steps;
+  }
+
+  function renderAll() {
+    renderPeople();
+    renderPayers();
+    renderSplitArea();
+    renderExpenses();
+    renderReceipt();
+  }
+
+  function renderPeople() {
+    peopleRow.innerHTML = '';
+    if (people.length === 0) {
+      peopleRow.innerHTML = '<div class="empty-state" style="padding:10px;"><span class="emoji">🧑‍🤝‍🧑</span>هنوز همسفری اضافه نشده. اولین نفر رو پایین اضافه کن!</div>';
+    }
+    people.forEach(p => {
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      const initial = p.name.trim().charAt(0) || '👤';
+      chip.innerHTML = `<span class="avatar" style="background:${avatarColor(p.name)}">${initial}</span><span><b>${p.name}</b> (ضریب: ${p.weight})</span><button data-id="${p.id}" style="border:none;background:none;color:var(--red);cursor:pointer;font-weight:bold;">✕</button>`;
+      chip.querySelector('button').addEventListener('click', async () => {
+        const involved = expenses.some(e => e.payerId === p.id || Object.keys(e.shares).includes(String(p.id)));
+        const msg = involved
+          ? `${p.name} در چند هزینه ثبت‌شده نقش دارد. حذف او ممکن است تراز مالی را تغییر دهد. ادامه می‌دهید؟`
+          : `همسفر ${p.name} از گروه حذف شود؟`;
+        const ok = await askConfirm(msg, '👤 حذف همسفر؟');
+        if (!ok) return;
+        people = people.filter(x => x.id !== p.id);
+        saveToLocalStorage();
+        renderAll();
+        showToast(`${p.name} از گروه حذف شد.`);
+      });
+      peopleRow.appendChild(chip);
+    });
+  }
+
+  // Enter key convenience on people/expense form inputs
+  personInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addPersonBtn.click(); });
+  personWeight.addEventListener('keydown', (e) => { if (e.key === 'Enter') addPersonBtn.click(); });
+  expTitle.addEventListener('keydown', (e) => { if (e.key === 'Enter') addExpenseBtn.click(); });
+  expAmount.addEventListener('keydown', (e) => { if (e.key === 'Enter') addExpenseBtn.click(); });
+
+  function renderPayers() {
+    const sel = expPayer.value;
+    expPayer.innerHTML = people.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+    if(sel) expPayer.value = sel;
+    const fsel = filterPayer.value;
+    filterPayer.innerHTML = '<option value="">👤 همه پرداخت‌کنندگان</option>' + people.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+    if (fsel) filterPayer.value = fsel;
+  }
+
+  function renderExpenses() {
+    expenseList.innerHTML = '';
+    const q = searchExpense.value.toLowerCase();
+    const payerFilterVal = filterPayer.value;
+    const catFilterVal = filterCategory.value;
+
+    let list = expenses.filter(e =>
+      (e.title.toLowerCase().includes(q) || e.category.toLowerCase().includes(q)) &&
+      (!payerFilterVal || String(e.payerId) === payerFilterVal) &&
+      (!catFilterVal || e.category === catFilterVal)
+    );
+
+    const sortMode = sortExpenses.value;
+    if (sortMode === 'newest') list = list.slice().sort((a,b) => (b.date > a.date ? 1 : -1) || b.id - a.id);
+    else if (sortMode === 'oldest') list = list.slice().sort((a,b) => (a.date > b.date ? 1 : -1) || a.id - b.id);
+    else if (sortMode === 'highest') list = list.slice().sort((a,b) => b.amount - a.amount);
+    else if (sortMode === 'lowest') list = list.slice().sort((a,b) => a.amount - b.amount);
+
+    expenseCountLabel.textContent = expenses.length === 0 ? '' : `نمایش ${list.length} از ${expenses.length} هزینه ثبت‌شده`;
+
+    if (list.length === 0) {
+      expenseList.innerHTML = expenses.length === 0
+        ? '<div class="empty-state"><span class="emoji">🧾</span>هنوز هزینه‌ای ثبت نشده. اولین فاکتور رو بالا وارد کن!</div>'
+        : '<div class="empty-state"><span class="emoji">🔍</span>با این فیلتر/جستجو موردی پیدا نشد.</div>';
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    list.forEach(e => {
+      const p = people.find(x => x.id === e.payerId);
+      const pName = p?.name || '؟';
+      const div = document.createElement('div');
+      div.className = 'expense-item';
+      div.innerHTML = `
+        <div>
+          <strong>${e.title}</strong> <span class="category-badge">${e.category}</span>
+          <br><small style="color:var(--muted)">📅 ${e.date} | پرداخت‌کننده: ${pName}</small>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="color:var(--gold-bright); font-weight:bold;">${formatMoney(e.amount)}</span>
+          <div class="expense-item-actions">
+            <button class="icon-btn" data-act="edit" title="ویرایش">✏️</button>
+            <button class="icon-btn" data-act="dup" title="کپی هزینه">📋</button>
+            <button class="icon-btn" data-act="del" title="حذف" style="color:var(--red);">🗑</button>
+          </div>
+        </div>
+      `;
+      div.querySelector('[data-act="edit"]').addEventListener('click', () => enterEditMode(e));
+      div.querySelector('[data-act="dup"]').addEventListener('click', () => duplicateExpense(e));
+      div.querySelector('[data-act="del"]').addEventListener('click', () => {
+        const idx = expenses.findIndex(x => x.id === e.id);
+        lastDeletedExpense = expenses[idx];
+        lastDeletedExpenseIndex = idx;
+        expenses = expenses.filter(x => x.id !== e.id);
+        saveToLocalStorage();
+        renderAll();
+        showToast(`🗑 "${e.title}" حذف شد.`, 'success', 'بازگردانی', () => {
+          expenses.splice(lastDeletedExpenseIndex, 0, lastDeletedExpense);
+          saveToLocalStorage();
+          renderAll();
+          showToast('↩️ هزینه بازگردانی شد.');
+        });
+      });
+      frag.appendChild(div);
+    });
+    expenseList.appendChild(frag);
+  }
+
+  function renderReceipt() {
+    const total = expenses.reduce((s, e) => s + e.amount, 0);
+    totalAmount.textContent = formatMoney(total);
+
+    const limit = getCleanNum(groupBudget.value);
+    const warn = document.getElementById('budgetWarning');
+    if(limit > 0 && total > limit) { warn.style.display = 'block'; } else { warn.style.display = 'none'; }
+
+    const days = tripDurationDays();
+    perDayAmount.textContent = days ? formatMoney(total / days) + ` (${days} روز)` : '—';
+
+    const bal = calcBalances();
+    balanceList.innerHTML = '';
+    if (people.length === 0) {
+      balanceList.innerHTML = '<div class="empty-state" style="padding:14px 0;">ابتدا همسفران را اضافه کنید تا تراز مالی محاسبه شود.</div>';
+    }
+    Object.keys(bal).forEach(pId => {
+      const p = people.find(x => x.id === parseInt(pId));
+      if(!p) return;
+      const val = bal[pId];
+      const cls = val >= 0 ? 'pos' : 'neg';
+      const mode = val >= 0 ? 'طلبکار 👑' : 'بدهکار 🔻';
+
+      const div = document.createElement('div');
+      div.className = 'balance-row';
+      div.innerHTML = `<span><b>${p.name}</b> (${mode})</span><span class="amt ${cls}">${formatMoney(Math.abs(val))}</span>`;
+      balanceList.appendChild(div);
+    });
+
+    const sets = getSettlements(bal);
+    settleBlock.innerHTML = '<h4>🗺 دستورالعمل تسویه حساب بهینه بین اعضا:</h4>';
+    if(sets.length === 0) {
+      settleBlock.innerHTML += '<div style="font-size:13px; color:var(--ink-soft); font-weight:bold;">🎉 حساب کتاب گروه کاملاً صاف است! هیچ بدهی‌ای وجود ندارد.</div>';
+    } else {
+      sets.forEach(s => {
+        settleBlock.innerHTML += `<div class="settle-line">💸 همسفر <b>${s.from}</b> باید مبلغ <b>${formatMoney(s.amount)}</b> به <b>${s.to}</b> پرداخت کند.</div>`;
+      });
+    }
+
+    renderCharts(total);
+    renderStats(total, bal);
+  }
+
+  function categoryColor(cat) { return CATEGORY_COLORS[cat] || '#8fa39b'; }
+
+  function renderCharts(total) {
+    categoryChart.innerHTML = '';
+    donutChart.innerHTML = '';
+    let cats = {};
+    expenses.forEach(e => { cats[e.category] = (cats[e.category] || 0) + e.amount; });
+    const tot = total || 1;
+    const keys = Object.keys(cats);
+
+    if (keys.length === 0) {
+      categoryChart.innerHTML = '<div class="empty-state" style="padding:10px 0;">هنوز داده‌ای برای نمودار وجود ندارد.</div>';
+      return;
+    }
+
+    keys.forEach(c => {
+      const p = (cats[c] / tot) * 100;
+      const div = document.createElement('div');
+      div.className = 'chart-bar-row';
+      div.innerHTML = `
+        <span style="width:8px; height:8px; border-radius:50%; background:${categoryColor(c)}; flex-shrink:0;"></span>
+        <span style="width:70px; font-weight:bold;">${c}</span>
+        <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${p}%; background:${categoryColor(c)};"></div></div>
+        <span style="font-weight:bold;">${Math.round(p)}%</span>
+      `;
+      categoryChart.appendChild(div);
+    });
+
+    // Donut chart (SVG conic sectors)
+    const cx = 60, cy = 60, r = 50;
+    let startAngle = -90;
+    let svgParts = '';
+    keys.forEach(c => {
+      const pct = cats[c] / tot;
+      const angle = pct * 360;
+      const endAngle = startAngle + angle;
+      const largeArc = angle > 180 ? 1 : 0;
+      const x1 = cx + r * Math.cos(startAngle * Math.PI / 180);
+      const y1 = cy + r * Math.sin(startAngle * Math.PI / 180);
+      const x2 = cx + r * Math.cos(endAngle * Math.PI / 180);
+      const y2 = cy + r * Math.sin(endAngle * Math.PI / 180);
+      svgParts += `<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${categoryColor(c)}" opacity="0.92"><title>${c}: ${Math.round(pct*100)}%</title></path>`;
+      startAngle = endAngle;
+    });
+    const holeColor = document.body.classList.contains('light-theme') ? '#fffdf7' : '#112926';
+    donutChart.innerHTML = svgParts + `<circle cx="${cx}" cy="${cy}" r="28" fill="${holeColor}" />`;
+  }
+
+  function renderStats(total, bal) {
+    const count = expenses.length;
+    const avg = count ? total / count : 0;
+    const days = tripDurationDays();
+    const perDay = days ? total / days : null;
+    let topCat = '—';
+    if (count) {
+      const cats = {};
+      expenses.forEach(e => { cats[e.category] = (cats[e.category] || 0) + e.amount; });
+      topCat = Object.keys(cats).sort((a,b) => cats[b]-cats[a])[0];
+    }
+    let topSpender = '—';
+    if (people.length) {
+      const paidTotals = {};
+      people.forEach(p => paidTotals[p.id] = 0);
+      expenses.forEach(e => { if (paidTotals[e.payerId] !== undefined) paidTotals[e.payerId] += e.amount; });
+      const topId = Object.keys(paidTotals).sort((a,b) => paidTotals[b]-paidTotals[a])[0];
+      const topP = people.find(p => p.id === parseInt(topId));
+      if (topP && paidTotals[topId] > 0) topSpender = topP.name;
+    }
+
+    const cards = [
+      { label: 'تعداد فاکتورهای ثبت‌شده', value: count.toLocaleString('fa-IR') },
+      { label: 'میانگین هر فاکتور', value: formatMoney(avg) },
+      { label: 'پرهزینه‌ترین دسته‌بندی', value: topCat },
+      { label: 'بیشترین پرداخت‌کننده', value: topSpender },
+    ];
+    statsGrid.innerHTML = cards.map(c => `
+      <div class="stat-box">
+        <div class="stat-label">${c.label}</div>
+        <div class="stat-value">${c.value}</div>
+      </div>
+    `).join('');
+  }
+
+  // Multiplatform Share Generation Text
+  function generateShareText() {
+    const total = expenses.reduce((s, e) => s + e.amount, 0);
+    const bal = calcBalances();
+    const sets = getSettlements(bal);
+    let t = `📊 گزارش نهایی تراز مالی ${tripName}\n💰 مجموع کل مخارج گروه: ${formatMoney(total)}\n\n`;
+    t += `وضعیت بستانکاری و بدهکاری:\n`;
+    people.forEach(p => { t += `${p.name}: ${formatMoney(bal[p.id])}\n`; });
+    t += `\nگام‌های پیشنهادی تسویه حساب:\n`;
+    if(sets.length === 0) { t += `✅ حساب‌ها کاملا تراز و صاف هستند.`; }
+    else { sets.forEach(s => { t += `🔹 ${s.from} -> ${formatMoney(s.amount)} -> ${s.to}\n`; }); }
+    return encodeURIComponent(t);
+  }
+
+  document.getElementById('shareTg').addEventListener('click', () => { window.open(`https://t.me/share/url?url=${generateShareText()}`); });
+  document.getElementById('shareWa').addEventListener('click', () => { window.open(`https://api.whatsapp.com/send?text=${generateShareText()}`); });
+  document.getElementById('shareBle').addEventListener('click', () => { window.open(`ble://share?text=${generateShareText()}`); });
+  document.getElementById('shareEta').addEventListener('click', () => { window.open(`eitaa://share?text=${generateShareText()}`); });
+
+  // Silent Local Storage Backup Core
+  function saveToLocalStorage() {
+    localStorage.setItem('dong_pro_v5_silent', JSON.stringify({ people, expenses, nextId, tripName, tripStart, tripEnd }));
+    syncToCloud();
+  }
+
+  function loadFromLocalStorage() {
+    let raw = localStorage.getItem('dong_pro_v5_silent');
+    if (!raw) raw = localStorage.getItem('dong_pro_v4_silent'); // migrate از نسخه قبلی
+    if(raw) {
+      try {
+        const p = JSON.parse(raw);
+        people = p.people || [];
+        expenses = p.expenses || [];
+        nextId = p.nextId || 1;
+        tripName = p.tripName || tripName;
+        tripStart = p.tripStart || '';
+        tripEnd = p.tripEnd || '';
+      } catch(e) {}
+    }
+  }
+
+  document.getElementById('saveFileBtn').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify({ people, expenses, nextId, tripName, tripStart, tripEnd })], { type: "application/json" });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "dong_travel_backup.json";
+    a.click();
+    showToast('📥 فایل پشتیبان دانلود شد.');
+  });
+
+  document.getElementById('loadFileBtn').addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json';
+    input.onchange = ev => {
+      const file = ev.target.files[0];
+      const r = new FileReader();
+      r.onload = readerEvent => {
+        try {
+          const parsed = JSON.parse(readerEvent.target.result);
+          if(parsed.people && parsed.expenses) {
+            people = parsed.people; expenses = parsed.expenses; nextId = parsed.nextId || 1;
+            tripName = parsed.tripName || tripName; tripStart = parsed.tripStart || ''; tripEnd = parsed.tripEnd || '';
+            applyTripInfoToUI();
+            saveToLocalStorage(); renderAll();
+            showToast('📤 بک‌آپ با موفقیت بارگذاری شد.');
+          }
+        } catch(e) { showToast('⚠️ فایل نامعتبر است.', 'error'); }
+      };
+      r.readAsText(file);
+    };
+    input.click();
+  });
+
+  document.getElementById('exportCsvBtn').addEventListener('click', () => {
+    let csv = "\uFEFFعنوان,مبلغ به تومان,تاریخ,پرداخت کننده,دسته بندی\n";
+    expenses.forEach(e => {
+      const pName = people.find(x => x.id === e.payerId)?.name || '؟';
+      csv += `"${e.title}",${e.amount},"${e.date}","${pName}","${e.category}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "travel_expenses.csv";
+    a.click();
+    showToast('📊 خروجی CSV دانلود شد.');
+  });
+
+  document.getElementById('pdfBtn').addEventListener('click', () => { window.print(); });
+  themeToggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('light-theme');
+    localStorage.setItem('dong_theme_v1', document.body.classList.contains('light-theme') ? 'light' : 'dark');
+    renderAll();
+  });
+  // Debounced live search for smoother typing on long lists
+  let searchDebounceTimer = null;
+  searchExpense.addEventListener('input', () => {
+    clearSearchBtn.style.display = searchExpense.value ? 'block' : 'none';
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(renderExpenses, 150);
+  });
+  clearSearchBtn.addEventListener('click', () => {
+    searchExpense.value = '';
+    clearSearchBtn.style.display = 'none';
+    renderExpenses();
+  });
+  filterPayer.addEventListener('change', renderExpenses);
+  filterCategory.addEventListener('change', renderExpenses);
+  sortExpenses.addEventListener('change', renderExpenses);
+
+  document.getElementById('clearAllBtn').addEventListener('click', async () => {
+    const ok = await askConfirm('همه همسفران، هزینه‌ها و تراز مالی این سفر برای همیشه پاک می‌شود. این عمل قابل بازگشت نیست.', '🗑 پاکسازی کامل اطلاعات؟');
+    if (ok) {
+      localStorage.removeItem('dong_pro_v5_silent');
+      localStorage.removeItem('dong_pro_v4_silent');
+      people = []; expenses = []; nextId = 1;
+      if (currentUser && fbDb) {
+        cloudDocRef(currentUser).set({ people, expenses, nextId }).catch(err => console.error(err));
+      }
+      renderAll();
+      showToast('🗑 همه اطلاعات پاک شد.');
+    }
+  });
+
+  sampleBtn.addEventListener('click', () => {
+    people = [
+      { id: 1, name: 'مهرداد', weight: 1 },
+      { id: 2, name: 'علی', weight: 1 },
+      { id: 3, name: 'سارا', weight: 2 }
+    ];
+    nextId = 4;
+    expenses = [
+      { id: 1, title: 'سوپر مارکت زنجیره‌ای اسکان', amount: 450000, payerId: 1, category: 'غذا', date: '2026-07-01', shares: { 1: 112500, 2: 112500, 3: 225000 } },
+      { id: 2, title: 'هزینه بنزین اتوبان و شارژ ماشین', amount: 800000, payerId: 2, category: 'حمل‌ونقل', date: '2026-07-01', shares: { 1: 200000, 2: 200000, 3: 400000 } }
+    ];
+    tripName = 'سفر نمونه شمال 🏕';
+    tripStart = '2026-07-01';
+    tripEnd = '2026-07-04';
+    applyTripInfoToUI();
+    saveToLocalStorage();
+    renderAll();
+    showToast('⚡ دیتای نمونه با موفقیت بارگذاری شد.');
+  });
+
+  window.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+</body>
+</html>
